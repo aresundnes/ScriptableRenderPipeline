@@ -12,46 +12,12 @@
 // This need to be fixed.
 
 #if defined(USING_STEREO_MATRICES)
-    #define glstate_matrix_projection unity_StereoMatrixP[unity_StereoEyeIndex]
-    #define unity_MatrixV unity_StereoMatrixV[unity_StereoEyeIndex]
-    #define unity_MatrixInvV unity_StereoMatrixInvV[unity_StereoEyeIndex]
-    #define unity_MatrixVP unity_StereoMatrixVP[unity_StereoEyeIndex]
-
-    #define unity_CameraProjection unity_StereoCameraProjection[unity_StereoEyeIndex]
-    #define unity_CameraInvProjection unity_StereoCameraInvProjection[unity_StereoEyeIndex]
-    #define unity_WorldToCamera unity_StereoWorldToCamera[unity_StereoEyeIndex]
-    #define unity_CameraToWorld unity_StereoCameraToWorld[unity_StereoEyeIndex]
     #define _WorldSpaceCameraPos _WorldSpaceCameraPosStereo[unity_StereoEyeIndex].xyz
     #define _WorldSpaceCameraPosEyeOffset _WorldSpaceCameraPosStereoEyeOffset[unity_StereoEyeIndex].xyz
     #define _PrevCamPosRWS _PrevCamPosRWSStereo[unity_StereoEyeIndex].xyz
 #endif
 
 #define UNITY_LIGHTMODEL_AMBIENT (glstate_lightmodel_ambient * 2)
-
-// ----------------------------------------------------------------------------
-
-//  *********************************************************
-//  *                                                       *
-//  *  UnityPerCameraRare has been deprecated. Do NOT use!  *
-//  *         Please refer to UnityPerView instead.         *
-//  *                                                       *
-//  *********************************************************
-
-CBUFFER_START(UnityPerCameraRare)
-    // DEPRECATED: use _FrustumPlanes
-    float4 unity_CameraWorldClipPlanes[6];
-
-#if !defined(USING_STEREO_MATRICES)
-    // Projection matrices of the camera. Note that this might be different from projection matrix
-    // that is set right now, e.g. while rendering shadows the matrices below are still the projection
-    // of original camera.
-    // DEPRECATED: use _ProjMatrix, _InvProjMatrix, _ViewMatrix, _InvViewMatrix
-    float4x4 unity_CameraProjection;
-    float4x4 unity_CameraInvProjection;
-    float4x4 unity_WorldToCamera;
-    float4x4 unity_CameraToWorld;
-#endif
-CBUFFER_END
 
 // ----------------------------------------------------------------------------
 
@@ -96,23 +62,6 @@ CBUFFER_START(UnityPerDraw)
     float4 unity_MotionVectorsParams;
 
 CBUFFER_END
-
-#if defined(USING_STEREO_MATRICES)
-CBUFFER_START(UnityStereoGlobals)
-    float4x4 unity_StereoMatrixP[2];
-    float4x4 unity_StereoMatrixV[2];
-    float4x4 unity_StereoMatrixInvV[2];
-    float4x4 unity_StereoMatrixVP[2];
-
-    float4x4 unity_StereoCameraProjection[2];
-    float4x4 unity_StereoCameraInvProjection[2];
-    float4x4 unity_StereoWorldToCamera[2];
-    float4x4 unity_StereoCameraToWorld[2];
-
-    float3 unity_StereoWorldSpaceCameraPos[2];
-    float4 unity_StereoScaleOffset[2];
-CBUFFER_END
-#endif
 
 CBUFFER_START(UnityPerDrawRare)
     float4x4 glstate_matrix_transpose_modelview0;
@@ -169,17 +118,6 @@ TEXTURE2D(_PrevExposureTexture);
 // Important: please use macros or functions to access the CBuffer data.
 // The member names and data layout can (and will) change!
 CBUFFER_START(UnityGlobal)
-    // ================================
-    //     PER FRAME CONSTANTS
-    // ================================
-    #if !defined(USING_STEREO_MATRICES)
-        float4x4 glstate_matrix_projection;
-        float4x4 unity_MatrixV;
-        float4x4 unity_MatrixInvV;
-        float4x4 unity_MatrixVP;
-        float4 unity_StereoScaleOffset;
-    #endif
-
     // ================================
     //     PER VIEW CONSTANTS
     // ================================

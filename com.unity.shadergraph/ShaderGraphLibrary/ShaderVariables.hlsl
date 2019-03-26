@@ -276,6 +276,7 @@ float4x4 OptimizeProjectionMatrix(float4x4 M)
     return M;
 }
 
+// For the shader graph node preview, we use the legacy unity matrices because they are pipeline agnostic.
 #include "ShaderVariablesMatrixDefsLegacyUnity.hlsl"
 
 #include "ShaderVariablesFunctions.hlsl"
