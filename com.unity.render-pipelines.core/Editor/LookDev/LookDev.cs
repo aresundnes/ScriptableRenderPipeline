@@ -63,7 +63,6 @@ namespace UnityEditor.Rendering.LookDev
         public static void Open()
         {
             window = EditorWindow.GetWindow<DisplayWindow>();
-            window.titleContent = LookDevStyle.WindowTitleAndIcon;
             ConfigureLookDev();
         }
 

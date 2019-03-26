@@ -78,10 +78,13 @@ namespace UnityEditor.Rendering.LookDev
         public void Dispose()
         {
             EditorSceneManager.ClosePreviewScene(m_PreviewScene);
+            Clear();
+        }
 
+        public void Clear()
+        {
             foreach (var go in m_GameObjects)
                 UnityEngine.Object.DestroyImmediate(go);
-
             m_GameObjects.Clear();
         }
 

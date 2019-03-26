@@ -1,3 +1,4 @@
+using System;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -31,7 +32,22 @@ namespace UnityEditor.Rendering.LookDev
                     RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
         }
     }
-    
+
+    //TODO: for automatising environment change
+    // if Unsupported.SetOverrideRenderSettings
+    // do not behave as expected (see Stage)
+    struct EnvironmentScope : IDisposable
+    {
+        public EnvironmentScope(bool b)
+        {
+        }
+
+        void IDisposable.Dispose()
+        {
+        }
+    }
+
+
     /// <summary>
     /// Rendering logic
     /// TODO: extract SceneLogic elswhere
@@ -41,8 +57,10 @@ namespace UnityEditor.Rendering.LookDev
         IDisplayer displayer;
         Context contexts;
         RenderTextureCache m_RenderTextures = new RenderTextureCache();
-        PreviewRenderUtility previewUtility;
+        //PreviewRenderUtility previewUtility;
+        Stage stage;
 
+        GUIStyle background = "IN BigTitle inner";
 
         public Renderer(
             IDisplayer displayer,
@@ -51,7 +69,8 @@ namespace UnityEditor.Rendering.LookDev
             this.displayer = displayer;
             this.contexts = contexts;
 
-            previewUtility = new PreviewRenderUtility();
+            //previewUtility = new PreviewRenderUtility();
+            stage = new Stage("LookDevViewA");
 
             EditorApplication.update += Render;
         }
@@ -63,15 +82,17 @@ namespace UnityEditor.Rendering.LookDev
             {
                 cleaned = true;
                 EditorApplication.update -= Render;
-                previewUtility.Cleanup();
+                //previewUtility.Cleanup();
+
             }
         }
         ~Renderer() => CleanUp();
 
         public void UpdateScene()
         {
-            previewUtility.Cleanup();
-            previewUtility = new PreviewRenderUtility();
+            //previewUtility.Cleanup();
+            //previewUtility = new PreviewRenderUtility();
+            stage.Clear();
             var viewContent = contexts.GetViewContent(ViewIndex.FirstOrFull);
             if (viewContent == null)
             {
@@ -79,12 +100,15 @@ namespace UnityEditor.Rendering.LookDev
                 return;
             }
 
-            var obj =
-                //PrefabUtility.LoadPrefabContentsIntoPreviewScene()
-                previewUtility.InstantiatePrefabInScene(viewContent.contentPrefab);
-            obj.transform.position = Vector3.zero;
-            obj.transform.rotation = Quaternion.identity;
-            viewContent.prefabInstanceInPreview = obj;
+            //var obj =
+            //    //PrefabUtility.LoadPrefabContentsIntoPreviewScene()
+            //    previewUtility.InstantiatePrefabInScene(viewContent.contentPrefab);
+            //obj.transform.position = Vector3.zero;
+            //obj.transform.rotation = Quaternion.identity;
+            //viewContent.prefabInstanceInPreview = obj;
+
+            viewContent.prefabInstanceInPreview =
+                stage.InstantiateInStage(viewContent.contentPrefab);
         }
 
         public void Render()
@@ -143,7 +167,7 @@ namespace UnityEditor.Rendering.LookDev
 
         private Texture RenderScene(Rect previewRect, CameraState cameraState, ViewContext context)
         {
-            previewUtility.BeginPreview(previewRect, "IN BigTitle inner");
+            previewUtility.BeginPreview(previewRect, displayer.backgroundStyle);
 
             previewUtility.camera.renderingPath = RenderingPath.DeferredShading;
             previewUtility.camera.backgroundColor = Color.white;
