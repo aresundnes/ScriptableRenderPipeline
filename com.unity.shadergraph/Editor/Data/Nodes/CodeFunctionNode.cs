@@ -47,6 +47,9 @@ namespace UnityEditor.ShaderGraph
 
         protected struct Texture3D
         {}
+        
+        protected struct Cubemap
+        {}
 
         protected struct SamplerState
         {}
